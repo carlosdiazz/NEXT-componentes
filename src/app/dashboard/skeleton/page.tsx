@@ -13,7 +13,7 @@ const getData = async () => {
   return "123456789".split("");
 };
 
-export default async function HomePage() {
+export default async function SkeletonPage() {
   const data = await getData();
 
   return (
