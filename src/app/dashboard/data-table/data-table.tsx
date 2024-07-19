@@ -52,6 +52,8 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
+  const isDeleteVisible = Object.keys(rowSelection).length > 0;
+
   const table = useReactTable({
     data,
     columns,
@@ -75,7 +77,7 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4 justify-between gap-4">
         <Input
-          placeholder="Filter emails..."
+          placeholder="Filtrar cmapos"
           value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
@@ -109,18 +111,23 @@ export function DataTable<TData, TValue>({
           </SelectContent>
         </Select>
 
-        <Button variant={"destructive"} onClick={() => {
-          //table.getSelectedRowModel().rows.forEach((row) => {
-          //  console.log(row.original);
-          //})
-          const ids = table.getSelectedRowModel().rows.map((row) => {
-            return (row.original as Payment).id
-          })
-          console.log(ids);
-          //console.log(rowSelection);
-        }}>
-          Delete
-        </Button>
+        {isDeleteVisible && (
+          <Button
+            variant={"destructive"}
+            onClick={() => {
+              //table.getSelectedRowModel().rows.forEach((row) => {
+              //  console.log(row.original);
+              //})
+              const ids = table.getSelectedRowModel().rows.map((row) => {
+                return (row.original as Payment).id;
+              });
+              console.log(ids);
+              //console.log(rowSelection);
+            }}
+          >
+            Delete
+          </Button>
+        )}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -224,6 +231,24 @@ export function DataTable<TData, TValue>({
             Next
           </Button>
         </div>
+
+        <Select onValueChange={(value) => {
+          table.setPageSize(+value);
+        }}>
+          <SelectTrigger className="w-[180px] m-2">
+            <SelectValue placeholder="10 rows"></SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Rows per page</SelectLabel>
+              <SelectItem value="5">5</SelectItem>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="25">25</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+              <SelectItem value="100">100</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

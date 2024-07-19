@@ -9,27 +9,54 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Checkbox
+  Checkbox,
 } from "@/components";
 import { Payment } from "@/data";
-import { ChevronDownIcon, ChevronUpIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
-  ColumnDef,
-  SortDirection,
-} from "@tanstack/react-table";
+  ChevronDownIcon,
+  ChevronUpIcon,
+  DotsHorizontalIcon,
+} from "@radix-ui/react-icons";
+import { ColumnDef, FilterFn, Row, SortDirection } from "@tanstack/react-table";
 import { toast } from "sonner";
 
+const myCustomFilterFn: FilterFn<Payment> = (
+  row: Row<Payment>,
+  columnId: string,
+  filterValue: string,
+  addMeta: (meta: any) => void
+) => {
+  filterValue = filterValue.toLowerCase();
+  const filterParts = filterValue.split(" ");
+
+  const rowValues =
+    `${row.original.email} ${row.original.clientName} ${row.original.status}`.toLowerCase();
+
+  return filterParts.every((part) => rowValues.includes(part));
+
+  //if (row.original.email.includes(filterValue)) {
+  //  return true
+  //}
+  //
+  //if (row.original.clientName.includes(filterValue)) {
+  //  return true
+  //}
+  //
+  //if (row.original.status.includes(filterValue)) {
+  //  return true
+  //}
+};
 
 const SortedIcon = ({ isSorted }: { isSorted: SortDirection | false }) => {
-  if (isSorted === 'asc') {
-    return <ChevronUpIcon className="h-4 w-4" />
-
-  } if (isSorted === 'desc') {
-    return <ChevronDownIcon className="h-4 w-4"/>
+  if (isSorted === "asc") {
+    return <ChevronUpIcon className="h-4 w-4" />;
+  }
+  if (isSorted === "desc") {
+    return <ChevronDownIcon className="h-4 w-4" />;
   }
 
   return null;
-}
+};
 
 export const columns: ColumnDef<Payment>[] = [
   {
@@ -66,7 +93,7 @@ export const columns: ColumnDef<Payment>[] = [
           Name
           <SortedIcon isSorted={column.getIsSorted()} />
         </Button>
-      )
+      );
     },
   },
 
@@ -81,7 +108,7 @@ export const columns: ColumnDef<Payment>[] = [
           Status
           <SortedIcon isSorted={column.getIsSorted()} />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
@@ -111,7 +138,7 @@ export const columns: ColumnDef<Payment>[] = [
           Amount
           <SortedIcon isSorted={column.getIsSorted()} />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
@@ -125,6 +152,7 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "email",
+    filterFn: myCustomFilterFn,
     header: ({ column }) => {
       return (
         <Button
@@ -134,7 +162,7 @@ export const columns: ColumnDef<Payment>[] = [
           Email
           <SortedIcon isSorted={column.getIsSorted()} />
         </Button>
-      )
+      );
     },
   },
   {
