@@ -9,21 +9,80 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Checkbox
 } from "@/components";
 import { Payment } from "@/data";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import { ColumnDef } from "@tanstack/react-table";
+import { ChevronDownIcon, ChevronUpIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
+import {
+  ColumnDef,
+  SortDirection,
+} from "@tanstack/react-table";
 import { toast } from "sonner";
+
+
+const SortedIcon = ({ isSorted }: { isSorted: SortDirection | false }) => {
+  if (isSorted === 'asc') {
+    return <ChevronUpIcon className="h-4 w-4" />
+
+  } if (isSorted === 'desc') {
+    return <ChevronDownIcon className="h-4 w-4"/>
+  }
+
+  return null;
+}
 
 export const columns: ColumnDef<Payment>[] = [
   {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+
+  {
     accessorKey: "clientName",
-    header: "Client Name",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Name
+          <SortedIcon isSorted={column.getIsSorted()} />
+        </Button>
+      )
+    },
   },
 
   {
     accessorKey: "status",
-    header: "Status",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Status
+          <SortedIcon isSorted={column.getIsSorted()} />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
       const variant =
@@ -43,7 +102,17 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Amount
+          <SortedIcon isSorted={column.getIsSorted()} />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
       const formatted = new Intl.NumberFormat("en-US", {
@@ -51,12 +120,22 @@ export const columns: ColumnDef<Payment>[] = [
         currency: "USD",
       }).format(amount);
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return <div className="font-medium">{formatted}</div>;
     },
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Email
+          <SortedIcon isSorted={column.getIsSorted()} />
+        </Button>
+      )
+    },
   },
   {
     id: "actions",
@@ -75,10 +154,10 @@ export const columns: ColumnDef<Payment>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => {
-                navigator.clipboard.writeText(payment.id)
-                toast("Payment ID copied",{
-                  position:'top-right'
-                })
+                navigator.clipboard.writeText(payment.id);
+                toast("Payment ID copied", {
+                  position: "top-right",
+                });
               }}
             >
               Copy payment ID

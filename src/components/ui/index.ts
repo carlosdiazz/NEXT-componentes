@@ -18,6 +18,7 @@ export * from "./label";
 export * from "./menubar";
 export * from "./popover";
 export * from "./progress";
+export * from "./select";
 export * from "./sheet";
 export * from "./skeleton";
 export * from "./slider";
